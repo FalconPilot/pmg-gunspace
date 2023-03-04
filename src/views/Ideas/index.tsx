@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import Head from 'next/head'
-
 import { Checkbox, Flex, Headings } from '@gunspace/components'
 import { Button } from '@gunspace/components/Button'
 import { pickRandom } from '@gunspace/utils'
@@ -21,8 +19,6 @@ import {
 } from '@gunspace/types'
 
 import * as Styled from './styled'
-import { Opengraph } from '@gunspace/components/opengraph'
-import { useRouter } from 'next/router'
 
 type GeneratedIdea = {
   action: GunAction,
@@ -40,7 +36,7 @@ const titles: { [k in keyof GeneratedIdea]: string } = {
   shape: 'Gun type',
 }
 
-const Ideas = () => {
+export const IdeasView: React.FC = () => {
   const [isRestrained, setRestrained] = React.useState(true)
   const [generatedIdea, setGeneratedIdea] = React.useState<GeneratedIdea | null>(null)
 
@@ -102,43 +98,29 @@ const Ideas = () => {
       .sort(([k1], [k2]) => titles[k1] > titles[k2] ? 1 : -1)
   ), [generatedIdea])
 
-  const router = useRouter()
-
-  console.log(router)
-
   return (
-    <>
-      <Head>
-        <title>PMG Gunspace - Ideas generator</title>
-        <meta name='description' content='PMG Gunspace ideas generator' />
-        <Opengraph.Title>Gunspace Ideas Generator</Opengraph.Title>
-        <Opengraph.Description>Generate whacky ideas to build a new gun.</Opengraph.Description>
-      </Head>
-      <Flex.Col center css={{ gap: '$1' }}>
-        <Headings.H1>Gun Ideas Generator</Headings.H1>
+    <Flex.Col center css={{ gap: '$1' }}>
+      <Headings.H1>Gun Ideas Generator</Headings.H1>
+      <Flex.Row css={{ gap: '$1' }}>
+        <Checkbox
+          label='Enable logic'
+          checked={isRestrained}
+          toggle={toggleLogic}
+        />
+        <Button onClick={generateIdea}>Generate an idea</Button>
+      </Flex.Row>
+      {partsList && (
         <Flex.Row css={{ gap: '$1' }}>
-          <Checkbox
-            label='Enable logic'
-            checked={isRestrained}
-            toggle={toggleLogic}
-          />
-          <Button onClick={generateIdea}>Generate an idea</Button>
+          {partsList.map(([key, value]) => (
+            <Styled.PartCard key={key}>
+              <Styled.PartTitle>
+                {titles[key as keyof GeneratedIdea]}
+              </Styled.PartTitle>
+              <Styled.PartValue>{value}</Styled.PartValue>
+            </Styled.PartCard>
+          ))}
         </Flex.Row>
-        {partsList && (
-          <Flex.Row css={{ gap: '$1' }}>
-            {partsList.map(([key, value]) => (
-              <Styled.PartCard key={key}>
-                <Styled.PartTitle>
-                  {titles[key as keyof GeneratedIdea]}
-                </Styled.PartTitle>
-                <Styled.PartValue>{value}</Styled.PartValue>
-              </Styled.PartCard>
-            ))}
-          </Flex.Row>
-        )}
-      </Flex.Col>
-    </>
+      )}
+    </Flex.Col>
   )
 }
-
-export default Ideas
