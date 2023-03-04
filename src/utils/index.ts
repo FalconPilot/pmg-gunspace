@@ -1,1 +1,1 @@
-export * from './guns'
+export * from './core'

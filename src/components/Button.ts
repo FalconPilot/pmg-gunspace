@@ -1,0 +1,14 @@
+import { styled } from '@gunspace/theme'
+
+export const Button = styled('button', {
+  color: '$white',
+  backgroundColor: '$transparent',
+  border: '2px solid $grey',
+  borderRadius: '$s',
+  transition: '0.1s',
+  fontWeight: '$bold',
+
+  '&:hover': {
+    backgroundColor: '$grey',
+  },
+})
