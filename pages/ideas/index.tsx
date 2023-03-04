@@ -21,6 +21,8 @@ import {
 } from '@gunspace/types'
 
 import * as Styled from './styled'
+import { Opengraph } from '@gunspace/components/opengraph'
+import { useRouter } from 'next/router'
 
 type GeneratedIdea = {
   action: GunAction,
@@ -100,11 +102,17 @@ const Ideas = () => {
       .sort(([k1], [k2]) => titles[k1] > titles[k2] ? 1 : -1)
   ), [generatedIdea])
 
+  const router = useRouter()
+
+  console.log(router)
+
   return (
     <>
       <Head>
         <title>PMG Gunspace - Ideas generator</title>
         <meta name='description' content='PMG Gunspace ideas generator' />
+        <Opengraph.Title>Gunspace Ideas Generator</Opengraph.Title>
+        <Opengraph.Description>Generate whacky ideas to build a new gun.</Opengraph.Description>
       </Head>
       <Flex.Col center css={{ gap: '$1' }}>
         <Headings.H1>Gun Ideas Generator</Headings.H1>
