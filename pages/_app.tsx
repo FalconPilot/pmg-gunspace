@@ -5,8 +5,8 @@ import type { AppProps } from 'next/app'
 import { Layout } from '@gunspace/components'
 
 const App = ({ Component, pageProps }: AppProps) =>
-  <Layout>
+  <Layout.Wrapper>
     <Component {...pageProps} />
-  </Layout>
+  </Layout.Wrapper>
 
 export default App

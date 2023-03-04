@@ -31,9 +31,9 @@ type GeneratedIdea = {
 const titles: { [k in keyof GeneratedIdea]: string } = {
   action: 'Action',
   caliber: 'Caliber',
-  magazine: 'Ammo feeding',
+  magazine: 'Ammo Feeding',
   optics: 'Aiming',
-  shape: 'Gun type',
+  shape: 'Gun Type',
 }
 
 export const IdeasView: React.FC = () => {
@@ -95,12 +95,10 @@ export const IdeasView: React.FC = () => {
           GunAction.SingleShot,
         ].includes(generatedIdea.action))
       ))
-      .sort(([k1], [k2]) => titles[k1] > titles[k2] ? 1 : -1)
   ), [generatedIdea])
 
   return (
-    <Flex.Col center css={{ gap: '$1' }}>
-      <Headings.H1>Gun Ideas Generator</Headings.H1>
+    <>
       <Flex.Row css={{ gap: '$1' }}>
         <Checkbox
           label='Enable logic'
@@ -121,6 +119,6 @@ export const IdeasView: React.FC = () => {
           ))}
         </Flex.Row>
       )}
-    </Flex.Col>
+    </>
   )
 }

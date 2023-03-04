@@ -2,10 +2,10 @@ import * as React from 'react'
 
 import Head from 'next/head'
 
-import { Opengraph } from '@gunspace/components/opengraph'
+import { Layout, Opengraph } from '@gunspace/components'
 import { IdeasView } from '@gunspace/views'
 
-const Ideas = () => {
+const Ideas = () =>
   <>
     <Head>
       <title>PMG Gunspace - Ideas generator</title>
@@ -13,8 +13,10 @@ const Ideas = () => {
       <Opengraph.Title>Gunspace Ideas Generator</Opengraph.Title>
       <Opengraph.Description>Generate whacky ideas to build a new gun.</Opengraph.Description>
     </Head>
-    <IdeasView />
+    <Layout.Header>Gun Ideas Generator</Layout.Header>
+    <Layout.Main>
+      <IdeasView />
+    </Layout.Main>
   </>
-}
 
 export default Ideas
