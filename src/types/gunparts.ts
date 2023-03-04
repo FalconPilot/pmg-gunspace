@@ -44,9 +44,21 @@ export enum Caliber {
 export enum Optics {
   Iron = 'Iron sights',
   FiberOptic = 'Fiber-optic sights',
-  Target = 'Target sights',
   RedDot = 'RDS/Holographic',
   Scope = 'Scope',
+  Target = 'Target sights',
+}
+
+export enum Material {
+  Aluminum = 'Aluminum',
+  AnodizedSteel = 'Anodized steel',
+  Bakelite = 'Bakelite',
+  BronzedMetal = 'Bronzed metal',
+  BrushedSteel = 'Brushed steel',
+  Gold = 'Gold',
+  PaintedMetal = 'Painted metal',
+  Polymer = 'Polymer',
+  Wood = 'Wood',
 }
 
 // Pistol-compatible data

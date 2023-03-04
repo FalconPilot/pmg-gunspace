@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Checkbox, Flex, Headings } from '@gunspace/components'
+import { Checkbox, Flex } from '@gunspace/components'
 import { Button } from '@gunspace/components/Button'
 import { pickRandom } from '@gunspace/utils'
 
@@ -9,6 +9,7 @@ import {
   GunAction,
   GunMagazine,
   GunShape,
+  Material,
   Optics,
   PistolActions,
   PistolCalibers,
@@ -21,11 +22,12 @@ import {
 import * as Styled from './styled'
 
 type GeneratedIdea = {
-  action: GunAction,
   caliber: Caliber,
   magazine: GunMagazine,
-  optics: Optics,
+  action: GunAction,
   shape: GunShape,
+  optics: Optics,
+  material: Material,
 }
 
 const titles: { [k in keyof GeneratedIdea]: string } = {
@@ -34,25 +36,27 @@ const titles: { [k in keyof GeneratedIdea]: string } = {
   magazine: 'Ammo Feeding',
   optics: 'Aiming',
   shape: 'Gun Type',
+  material: 'Main material',
 }
 
 export const IdeasView: React.FC = () => {
-  const [isRestrained, setRestrained] = React.useState(true)
+  const [logicEnabled, setLogic] = React.useState(true)
   const [generatedIdea, setGeneratedIdea] = React.useState<GeneratedIdea | null>(null)
 
   const toggleLogic = React.useCallback(() => {
-    setRestrained(restrained => !restrained)
-  }, [setRestrained])
+    setLogic(status => !status)
+  }, [logicEnabled])
 
   const generateIdea = React.useCallback(() => {
     // Logic disabled
-    if (!isRestrained) {
+    if (!logicEnabled) {
       setGeneratedIdea({
         action: pickRandom(Object.values(GunAction)),
         caliber: pickRandom(Object.values(Caliber)),
         magazine: pickRandom(Object.values(GunMagazine)),
         optics: pickRandom(Object.values(Optics)),
         shape: pickRandom(Object.values(GunShape)),
+        material: pickRandom(Object.values(Material))
       })
       return
     }
@@ -76,10 +80,11 @@ export const IdeasView: React.FC = () => {
       action,
       caliber,
       magazine,
-      optics: pickRandom(Object.values(Optics)),
       shape,
+      optics: pickRandom(Object.values(Optics)),
+      material: pickRandom(Object.values(Material)),
     })
-  }, [isRestrained, setGeneratedIdea])
+  }, [logicEnabled, setGeneratedIdea])
   
   const partsList = React.useMemo(() => (
     generatedIdea && Object.entries(generatedIdea)
@@ -102,7 +107,7 @@ export const IdeasView: React.FC = () => {
       <Flex.Row css={{ gap: '$1' }}>
         <Checkbox
           label='Enable logic'
-          checked={isRestrained}
+          checked={logicEnabled}
           toggle={toggleLogic}
         />
         <Button onClick={generateIdea}>Generate an idea</Button>
