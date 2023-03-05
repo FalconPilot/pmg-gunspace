@@ -15,7 +15,9 @@ export const pickPercentileRandom = <T>(
     arr.filter(i => !rng.map(r => r[0]).includes(i))
   )
 
-  return rng.reduce((current, [item, prob]) => (
-    roll <= prob ? item : current
-  ), fallback)
+  return rng
+    .sort(([_1, r1], [_2, r2]) => r2 - r1)
+    .reduce((current, [item, prob]) => (
+      roll <= prob ? item : current
+    ), fallback)
 }

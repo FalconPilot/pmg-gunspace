@@ -78,10 +78,18 @@ export const IdeasView: React.FC = () => {
       [
         [TriggerMechanism.Neopup, 2],
         [TriggerMechanism.Bullpup, 15],
-      ]
+      ],
     )
 
-    const material = pickRandom(Object.values(Material))
+    const material = pickPercentileRandom(
+      Object.values(Material),
+      [
+        [Material.Gold, 2],
+        [Material.Bakelite, 4],
+        [Material.BronzedMetal, 8],
+      ],
+    )
+
     const shape = pickRandom(Object.values(GunShape))
     const optics = pickRandom(Object.values(Optics))
 
