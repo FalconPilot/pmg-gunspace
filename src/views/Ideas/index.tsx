@@ -46,6 +46,10 @@ const titles: { [k in keyof GeneratedIdea]: string } = {
 // View component
 export const IdeasView: React.FC = () => {
   const [logicEnabled, setLogic] = React.useState(true)
+  const [weights, setWeights] = React.useState({
+    triggerMechanism: true,
+    material: true,
+  })
   const [generatedIdea, setGeneratedIdea] = React.useState<GeneratedIdea | null>(null)
 
   const toggleLogic = React.useCallback(() => {
@@ -69,26 +73,38 @@ export const IdeasView: React.FC = () => {
     )
   ), [])
 
+  // Toggle a weight
+  const toggleWeight = React.useCallback((key: keyof typeof weights) => () => {
+    setWeights(w => ({
+      ...w,
+      [key]: !w[key],
+    }))
+  }, [setWeights])
+
   // Generate a gun idea
   const generateIdea = React.useCallback(() => {
 
     // Logic-agnostic parts
-    const triggerMechanism = pickPercentileRandom(
-      Object.values(TriggerMechanism),
-      [
-        [TriggerMechanism.Neopup, 2],
-        [TriggerMechanism.Bullpup, 15],
-      ],
-    )
+    const triggerMechanism = weights.triggerMechanism
+      ? pickPercentileRandom(
+        Object.values(TriggerMechanism),
+        [
+          [TriggerMechanism.Neopup, 2],
+          [TriggerMechanism.Bullpup, 15],
+        ],
+      )
+      : pickRandom(Object.values(TriggerMechanism))
 
-    const material = pickPercentileRandom(
-      Object.values(Material),
-      [
-        [Material.Gold, 2],
-        [Material.Bakelite, 4],
-        [Material.BronzedMetal, 8],
-      ],
-    )
+    const material = weights.material
+      ? pickPercentileRandom(
+        Object.values(Material),
+        [
+          [Material.Gold, 2],
+          [Material.Bakelite, 4],
+          [Material.BronzedMetal, 8],
+        ],
+      )
+      : pickRandom(Object.values(Material))
 
     const shape = pickRandom(Object.values(GunShape))
     const optics = pickRandom(Object.values(Optics))
@@ -129,16 +145,24 @@ export const IdeasView: React.FC = () => {
       material,
       triggerMechanism,
     })
-  }, [logicEnabled, setGeneratedIdea])
+  }, [logicEnabled, weights, setGeneratedIdea])
   
   const partsList = React.useMemo(() => (
     generatedIdea && Object.entries(generatedIdea)
       .map(([key, value]) => [
         key as keyof GeneratedIdea,
-        value
+        value,
       ] as const)
       .filter(filterPart(generatedIdea))
   ), [generatedIdea])
+
+  const weightsList = React.useMemo(() => (
+    Object.entries(weights)
+      .map(([key, value]) => [
+        key as keyof typeof weights,
+        value,
+      ] as const)
+  ), [weights])
 
   return (
     <>
@@ -148,6 +172,14 @@ export const IdeasView: React.FC = () => {
           checked={logicEnabled}
           toggle={toggleLogic}
         />
+        {weightsList.map(([key, weight]) => (
+          <Checkbox
+            key={key}
+            label={`${titles[key]} weight`}
+            checked={weight}
+            toggle={toggleWeight(key)}
+          />
+        ))}
         <Button onClick={generateIdea}>Generate an idea</Button>
       </Flex.Row>
       {partsList && (
