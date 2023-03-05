@@ -21,6 +21,12 @@ export enum GunShape {
   ShortRifle = 'Carbine',
 }
 
+export enum TriggerMechanism {
+  Conventional = 'Conventional',
+  Bullpup = 'Bullpup',
+  Neopup = 'Neopup',
+}
+
 export enum GunMagazine {
   BeltFed = 'Belt-fed',
   BoxMag = 'Box magazine',
@@ -35,6 +41,8 @@ export enum Caliber {
   x556x45 = '5.56x45mm',
   x762x39 = '7.62x39mm',
   x762x54 = '7.62x54mm',
+  x308 = '.308',
+  x4570 = '.45-70',
   x127x99 = '12.7x99mm',
   x127x108 = '12.7x108mm',
   x20g = '20 Gauge',

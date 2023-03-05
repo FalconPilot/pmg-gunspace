@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { Checkbox, Flex } from '@gunspace/components'
 import { Button } from '@gunspace/components/Button'
-import { pickRandom } from '@gunspace/utils'
+import { pickPercentileRandom, pickRandom } from '@gunspace/utils'
 
 import {
   Caliber,
@@ -16,7 +16,9 @@ import {
   PistolMags,
   RifleActions,
   RifleCalibers,
-  RifleMags
+  RifleMags,
+  TriggerMechanism,
+  ValueOf
 } from '@gunspace/types'
 
 import * as Styled from './styled'
@@ -26,6 +28,7 @@ type GeneratedIdea = {
   magazine: GunMagazine,
   action: GunAction,
   shape: GunShape,
+  triggerMechanism: TriggerMechanism,
   optics: Optics,
   material: Material,
 }
@@ -36,9 +39,11 @@ const titles: { [k in keyof GeneratedIdea]: string } = {
   magazine: 'Ammo Feeding',
   optics: 'Aiming',
   shape: 'Gun Type',
+  triggerMechanism: 'Trigger position',
   material: 'Main material',
 }
 
+// View component
 export const IdeasView: React.FC = () => {
   const [logicEnabled, setLogic] = React.useState(true)
   const [generatedIdea, setGeneratedIdea] = React.useState<GeneratedIdea | null>(null)
@@ -47,23 +52,54 @@ export const IdeasView: React.FC = () => {
     setLogic(status => !status)
   }, [logicEnabled])
 
+  // Filter a part depending on idea params
+  const filterPart = React.useCallback((idea: GeneratedIdea) => ([key]: readonly [
+    keyof GeneratedIdea,
+    ValueOf<GeneratedIdea>,
+  ]) => !(
+    (
+      key === 'magazine' && [
+        GunAction.Revolving,
+        GunAction.SingleShot,
+      ].includes(idea.action)
+    ) ||
+    (
+      key === 'triggerMechanism' &&
+      idea.shape === GunShape.Handgun
+    )
+  ), [])
+
+  // Generate a gun idea
   const generateIdea = React.useCallback(() => {
+
+    // Logic-agnostic parts
+    const triggerMechanism = pickPercentileRandom(
+      Object.values(TriggerMechanism),
+      [
+        [TriggerMechanism.Neopup, 2],
+        [TriggerMechanism.Bullpup, 15],
+      ]
+    )
+
+    const material = pickRandom(Object.values(Material))
+    const shape = pickRandom(Object.values(GunShape))
+    const optics = pickRandom(Object.values(Optics))
+
     // Logic disabled
     if (!logicEnabled) {
       setGeneratedIdea({
+        optics,
+        shape,
+        triggerMechanism,
+        material,
         action: pickRandom(Object.values(GunAction)),
         caliber: pickRandom(Object.values(Caliber)),
         magazine: pickRandom(Object.values(GunMagazine)),
-        optics: pickRandom(Object.values(Optics)),
-        shape: pickRandom(Object.values(GunShape)),
-        material: pickRandom(Object.values(Material))
       })
       return
     }
 
     // Logic enabled
-    const shape = pickRandom(Object.values(GunShape))
-
     const caliber = shape === GunShape.Handgun
       ? pickRandom(PistolCalibers)
       : pickRandom(RifleCalibers)
@@ -81,8 +117,9 @@ export const IdeasView: React.FC = () => {
       caliber,
       magazine,
       shape,
-      optics: pickRandom(Object.values(Optics)),
-      material: pickRandom(Object.values(Material)),
+      optics,
+      material,
+      triggerMechanism,
     })
   }, [logicEnabled, setGeneratedIdea])
   
@@ -92,14 +129,7 @@ export const IdeasView: React.FC = () => {
         key as keyof GeneratedIdea,
         value
       ] as const)
-      .filter(([key]) => !(
-        ([
-          'magazine',
-        ].includes(key) && [
-          GunAction.Revolving,
-          GunAction.SingleShot,
-        ].includes(generatedIdea.action))
-      ))
+      .filter(filterPart(generatedIdea))
   ), [generatedIdea])
 
   return (
