@@ -43,11 +43,22 @@ const titles: { [k in keyof GeneratedIdea]: string } = {
   material: 'Main material',
 }
 
+const variadic = <T extends unknown>(
+  list: T[] | readonly T[],
+  rng: Array<readonly [T, number]>,
+  weighted: boolean,
+): T =>
+  !weighted
+    ? pickRandom(list)
+    : pickPercentileRandom(list, rng)
+
 // View component
 export const IdeasView: React.FC = () => {
   const [logicEnabled, setLogic] = React.useState(true)
   const [weights, setWeights] = React.useState({
+    action: true,
     triggerMechanism: true,
+    magazine: true,
     material: true,
   })
   const [generatedIdea, setGeneratedIdea] = React.useState<GeneratedIdea | null>(null)
@@ -85,26 +96,36 @@ export const IdeasView: React.FC = () => {
   const generateIdea = React.useCallback(() => {
 
     // Logic-agnostic parts
-    const triggerMechanism = weights.triggerMechanism
-      ? pickPercentileRandom(
-        Object.values(TriggerMechanism),
-        [
-          [TriggerMechanism.Neopup, 2],
-          [TriggerMechanism.Bullpup, 15],
-        ],
-      )
-      : pickRandom(Object.values(TriggerMechanism))
+    const triggerMechanism = variadic(
+      Object.values(TriggerMechanism),
+      [
+        [TriggerMechanism.Neopup, 2],
+        [TriggerMechanism.Bullpup, 15],
+      ],
+      weights.triggerMechanism,
+    )
 
-    const material = weights.material
-      ? pickPercentileRandom(
-        Object.values(Material),
-        [
-          [Material.Gold, 2],
-          [Material.Bakelite, 4],
-          [Material.BronzedMetal, 8],
-        ],
-      )
-      : pickRandom(Object.values(Material))
+    const material = variadic(
+      Object.values(Material),
+      [
+        [Material.Gold, 2],
+        [Material.Bakelite, 4],
+        [Material.BronzedMetal, 8],
+      ],
+      weights.material,
+    )
+
+    const rifleActionWeights = [
+      [GunAction.BurstFire, 3] as const,
+      [GunAction.Revolving, 6] as const,
+      [GunAction.LeverAction, 9] as const,
+      [GunAction.SingleShot, 12] as const,
+      [GunAction.BoltAction, 20] as const,
+    ]
+
+    const rifleMagsWeights = [
+      [GunMagazine.BoxMag, 90] as const,
+    ]
 
     const shape = pickRandom(Object.values(GunShape))
     const optics = pickRandom(Object.values(Optics))
@@ -116,25 +137,53 @@ export const IdeasView: React.FC = () => {
         shape,
         triggerMechanism,
         material,
-        action: pickRandom(Object.values(GunAction)),
         caliber: pickRandom(Object.values(Caliber)),
-        magazine: pickRandom(Object.values(GunMagazine)),
+        action: variadic(
+          Object.values(GunAction),
+          rifleActionWeights,
+          weights.action
+        ),
+        magazine: variadic(
+          Object.values(GunMagazine),
+          rifleMagsWeights,
+          weights.magazine
+        ),
       })
       return
     }
 
     // Logic enabled
+    const action = shape === GunShape.Handgun
+      ? variadic(
+        PistolActions,
+        [
+          [GunAction.SemiAuto, 75]
+        ],
+        weights.action,
+      )
+      : variadic(
+        RifleActions,
+        rifleActionWeights,
+        weights.action,
+      )
+
     const caliber = shape === GunShape.Handgun
       ? pickRandom(PistolCalibers)
       : pickRandom(RifleCalibers)
 
-    const action = shape === GunShape.Handgun
-      ? pickRandom(PistolActions)
-      : pickRandom(RifleActions)
-
     const magazine = shape === GunShape.Handgun
-      ? pickRandom(PistolMags)
-      : pickRandom(RifleMags)
+      ? variadic(
+        PistolMags,
+        [
+          [GunMagazine.BoxMag, 95],
+        ],
+        weights.magazine,
+      )
+      : variadic(
+        RifleMags,
+        rifleMagsWeights,
+        weights.magazine,
+      )
 
     setGeneratedIdea({
       action,
